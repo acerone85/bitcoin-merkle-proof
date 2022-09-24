@@ -27,31 +27,3 @@ def compute_merkle_root_aux(hashes, n):
 def compute_merkle_root(hashes):
     hashes = list(map(lambda x: bytes.fromhex(x), hashes))
     return bytes.hex(compute_merkle_root_aux(hashes.copy(), len(hashes)))
-
-
-def verify_merkle_proof_aux(tx_hash, merkle_proof, tx_index):
-    if len(merkle_proof) == 0:
-        return tx_hash
-    else:
-        if (tx_index % 2 == 0):
-            (left, right) = (tx_hash, merkle_proof[0])
-        else:
-            (left, right) = (merkle_proof[0], tx_hash)
-
-        return verify_merkle_proof_aux(
-            concat_dsha256(left, right),
-            merkle_proof[1::],
-            tx_index/2
-        )
-
-
-def verify_merkle_proof(merkle_root, merkle_proof, tx_index):
-    merkle_proof_as_bytes = list(map(lambda x: bytes.fromhex(x), merkle_proof))
-    computed_merkle_root = bytes.hex(verify_merkle_proof_aux(
-        merkle_proof_as_bytes[0],
-        merkle_proof_as_bytes[1::],
-        tx_index
-    ))
-    print(f'Actual merkle root: {merkle_root}')
-    print(f'Computed merkle root: {computed_merkle_root}')
-    return merkle_root == computed_merkle_root
