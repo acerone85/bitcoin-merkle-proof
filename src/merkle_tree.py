@@ -1,14 +1,14 @@
 import hash_functions
 
 
-class __Cell:
+class _Cell:
     def __init__(self, *args):
         if (len(args) == 0):
             self.is_leaf = True
             self.init_with_value(None)
 
         elif (len(args) == 1):
-            self.is_leaf = False
+            self.is_leaf = True
             self.__init_with_value(args[0])
 
         elif (len(args) == 2):
@@ -34,11 +34,11 @@ class __Cell:
             strings = list()
             if (self.left != None):
                 strings.append(
-                    f"{indent + '  '}Left=[{self.left.str_helper(indent + '  ')}]")
+                    f"{indent + '  '}Left=[{self.left.__str_helper(indent + '  ')}]")
 
             if (self.right != None):
                 strings.append(
-                    f"{indent + '  '}Right=[{self.right.str_helper(indent + '  ')}]")
+                    f"{indent + '  '}Right=[{self.right.__str_helper(indent + '  ')}]")
 
             return f"Tree({newline}{newline.join(strings)}{newline}{indent})"
 
@@ -73,7 +73,7 @@ class __Cell:
             return (merkle_proof, flags, hash)
 
 
-class Tree:
+class _Tree:
     """A binary tree whose leaves are either None or hashes of transactions
     contained in bitcoin nodes. Only leaves in the tree contain a value. 
     """
@@ -86,7 +86,7 @@ class Tree:
         if (number_of_leaves == 0):
             raise Exception("Merkle tree must have at least one leave")
 
-        leaves = list(map(lambda _: __Cell(None),
+        leaves = list(map(lambda _: _Cell(None),
                       range(0, number_of_leaves, 1)))
         self.__construct(leaves)
 
@@ -103,11 +103,11 @@ class Tree:
                 right_child = None
             else:
                 right_child = current_level[i+1]
-            next_level.append(__Cell(left_child, right_child))
+            next_level.append(_Cell(left_child, right_child))
             i += 2
-        self.construct(next_level)
+        self.__construct(next_level)
 
-    def __compute_merkle_root(self, merkle_proof, flags):
+    def compute_merkle_root(self, merkle_proof, flags):
 
         flags = [*flags]
         merkle_proof_as_bytes = list(
@@ -118,7 +118,7 @@ class Tree:
         )
         return bytes.hex(merkle_root)
 
-    def __str__(self): self.root.__str__()
+    def __str__(self): return self.root.__str__()
 
 
 def compute_merkle_tree(merkle_proof_output):
@@ -140,6 +140,6 @@ def compute_merkle_tree(merkle_proof_output):
     n_txs = merkle_proof_output['number_txs']
     hashes = merkle_proof_output['hashes']
     flag = merkle_proof_output['flag']
-    tree = Tree(n_txs)
-    merkle_root = tree.__compute_merkle_root(hashes, flag)
+    tree = _Tree(n_txs)
+    merkle_root = tree.compute_merkle_root(hashes, flag)
     return (merkle_root, tree)
