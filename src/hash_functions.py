@@ -10,6 +10,19 @@ def __dsha256(bytes):
 
 
 def concat_dsha256(left, right):
+    """Concatenates two byte sequences together and hashes them using SHA256. 
+    The hash computed is returned as a sequence of bytes.
+    Because hashes of transactions in bitcoin blocks are stored in 
+    little-endian order, the two byte sequences are reversed before being 
+    concatenated, and so is  result of the final hash.
+
+    Args:
+        left (bytes): _description_
+        right (bytes): _description_
+
+    Returns:
+        bytes: the hash of the concatenated input values as a byte sequence
+    """
     return __dsha256((right + left)[::-1])[::-1]
 
 
